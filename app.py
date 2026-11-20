@@ -1,5 +1,6 @@
 
 import gradio as gr
+import spaces
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,7 +10,7 @@ from PIL import Image
 from torchvision import transforms
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 
 
 class ConvBlock(nn.Module):
@@ -132,7 +133,7 @@ checkpoint = torch.load(
 )
 
 model.load_state_dict(checkpoint["model_state_dict"], strict=True)
-model.to(device)
+model.to('cpu')
 model.eval()
 
 
@@ -146,12 +147,14 @@ transform = transforms.Compose([
 ])
 
 
+@spaces.GPU
 def predict_image(image):
     if image is None:
         return None, None
 
     original = image.convert("RGB")
-    tensor = transform(original).unsqueeze(0).to(device)
+    model.to('cuda')
+    tensor = transform(original).unsqueeze(0).to('cuda')
 
     with torch.no_grad():
         output = torch.sigmoid(model(tensor))
@@ -171,6 +174,8 @@ def predict_image(image):
         0.5 * np.array([255, 0, 0])
     ).astype(np.uint8)
 
+    model.to('cpu')
+    torch.cuda.empty_cache()
     return mask_image, Image.fromarray(overlay)
 
 
