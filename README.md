@@ -46,3 +46,8 @@ The ResNet-50 ablation model was trained for fewer epochs than the fine-tuned Re
 
 ## Author
 Waqar Ahmad
+
+## Live Demo
+Try the deployed Gradio application: https://xafar0852-citycare-cod-demo.hf.space
+
+The demo runs on Hugging Face Spaces with ZeroGPU. Upload an image to view the predicted segmentation mask and detected-object overlay.
